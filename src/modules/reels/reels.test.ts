@@ -1,18 +1,17 @@
 import Fastify from "fastify"
 import { reelsRoutes } from "./reels.routes"
 
-describe("GET /reels/grid", () => {
-    it("should return a list of reels with a 200 status code", async () => {
+describe("GET /tagged/grid", () => {
+    it("should return a list of tagged posts with a 200 status code", async () => {
         const app = Fastify()
-        const mockReels = [
+        const mockTagged = [
             {
                 id: 1,
-                video_url:
-                    "http://example.com/video1.mp4](http://example.com/video1.mp4)",
-                thumbnail_url:
-                    "http://example.com/thumb1.png](http://example.com/thumb1.png)",
-                caption: "Reel 1",
-                views: 100,
+                post_id: 10,
+                tagged_user_id: 7,
+                username: "jane",
+                thumbnail_url: "http://example.com/thumb10.png",
+                caption: "Tagged post 1",
             },
             {
                 id: 2,

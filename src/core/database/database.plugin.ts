@@ -33,7 +33,7 @@ async function databasePluginHelper(fastify: FastifyInstance) {
       video_url TEXT NOT NULL,
       thumbnail_url TEXT NOT NULL,
       caption TEXT,
-      views INTEGER NOT NULL DEFAULT 0,
+      views INTEGER NOT NULL DEFAULT 0
     );
 `)
 
