@@ -27,6 +27,16 @@ async function databasePluginHelper(fastify: FastifyInstance) {
     );
 `)
 
+    db.exec(`
+    CREATE TABLE IF NOT EXISTS reels (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      video_url TEXT NOT NULL,
+      thumbnail_url TEXT NOT NULL,
+      caption TEXT,
+      views INTEGER NOT NULL DEFAULT 0,
+    );
+`)
+
     const transactions = createTransactionHelpers(db)
 
     fastify.decorate("db", db)
