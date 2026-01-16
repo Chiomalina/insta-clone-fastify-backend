@@ -16,7 +16,7 @@ const createTransactionHelpers = (db: Database) => {
         getById: (id: number) => {
             return statements.getPostById.get(id)
         },
-        getAll: ():=> {
+        getAll: () => {
             return statements.getAllPosts.all()
         },
         create: (data: CreatePostDto) => {
