@@ -8,18 +8,18 @@ describe("GET /reels/grid", () => {
             {
                 id: 1,
                 video_url:
-                    "[http://example.com/video1.mp4](http://example.com/video1.mp4)",
+                    "http://example.com/video1.mp4](http://example.com/video1.mp4)",
                 thumbnail_url:
-                    "[http://example.com/thumb1.png](http://example.com/thumb1.png)",
+                    "http://example.com/thumb1.png](http://example.com/thumb1.png)",
                 caption: "Reel 1",
                 views: 100,
             },
             {
                 id: 2,
                 video_url:
-                    "[http://example.com/video2.mp4](http://example.com/video2.mp4)",
+                    "http://example.com/video2.mp4](http://example.com/video2.mp4)",
                 thumbnail_url:
-                    "[http://example.com/thumb2.png](http://example.com/thumb2.png)",
+                    "http://example.com/thumb2.png](http://example.com/thumb2.png)",
                 caption: "Reel 2",
                 views: 200,
             },
