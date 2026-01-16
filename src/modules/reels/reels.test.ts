@@ -1,5 +1,6 @@
 import Fastify from "fastify"
 import { reelsRoutes } from "./reels.routes"
+import type { Reel } from "./reels.types"
 
 describe("GET /reels/grid", () => {
     it("should return a list of reels with a 200 status code", async () => {
@@ -34,7 +35,7 @@ describe("GET /reels/grid", () => {
                 getById: jest.fn(),
             },
             reels: {
-                getAll: jest.fn().mockReturnValue(mockReels),
+                getAll: jest.fn().mockResolvedValue(mockReels),
             },
         })
 
