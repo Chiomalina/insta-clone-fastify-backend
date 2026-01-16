@@ -19,12 +19,12 @@ async function databasePluginHelper(fastify: FastifyInstance) {
 
     // Create a simple table for testing if it doesn't exist
     db.exec(`
-  CREATE TABLE IF NOT EXISTS posts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    img_url TEXT NOT NULL,
-    caption TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
+    CREATE TABLE IF NOT EXISTS posts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      img_url TEXT NOT NULL,
+      caption TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
 `)
 
     const transactions = createTransactionHelpers(db)
