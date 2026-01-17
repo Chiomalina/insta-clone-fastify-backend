@@ -17,7 +17,7 @@ async function databasePluginHelper(fastify: FastifyInstance) {
     const db = new Database("./database.db")
     fastify.log.info("SQLite database connection established.")
 
-    // Create a simple table for testing if it doesn't exist
+    // --- Schema setup (must run BEFORE createTransactionHelpers) ---
     db.exec(`
     CREATE TABLE IF NOT EXISTS posts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,9 +25,7 @@ async function databasePluginHelper(fastify: FastifyInstance) {
       caption TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
-`)
 
-    db.exec(`
     CREATE TABLE IF NOT EXISTS reels (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       video_url TEXT NOT NULL,
@@ -35,7 +33,32 @@ async function databasePluginHelper(fastify: FastifyInstance) {
       caption TEXT,
       views INTEGER NOT NULL DEFAULT 0
     );
-`)
+
+    -- Tagged posts table (needed by transactions.tagged.*)
+    CREATE TABLE IF NOT EXISTS tagged (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      thumbnail_url TEXT NOT NULL,
+      caption TEXT
+    );
+
+    -- Highlights table (name must match database.transactions.ts: "highlights")
+    CREATE TABLE IF NOT EXISTS highlights (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      cover_image_url TEXT NOT NULL,
+      title TEXT
+    );
+  `)
+
+    // --- Optional seed data (prevents empty UI; avoids duplicates) ---
+    db.exec(`
+    INSERT INTO tagged (thumbnail_url, caption)
+    SELECT 'http://example.com/tagged-thumb1.png', 'Tagged 1'
+    WHERE NOT EXISTS (SELECT 1 FROM tagged);
+
+    INSERT INTO highlights (cover_image_url, title)
+    SELECT 'http://example.com/highlights-image1.png', 'Highlight 1'
+    WHERE NOT EXISTS (SELECT 1 FROM highlights);
+  `)
 
     const transactions = createTransactionHelpers(db)
 

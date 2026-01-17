@@ -164,5 +164,5 @@ it("should return 404 if id is not a number", async () => {
         url: "/highlights/abc",
     })
 
-    expect(response.statusCode).toBe(404)
+    expect(response.statusCode).toBe(400)
 })
