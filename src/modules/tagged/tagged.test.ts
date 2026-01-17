@@ -36,7 +36,6 @@ describe("GET /tagged/grid", () => {
             tagged: {
                 getAll: jest.fn().mockResolvedValue(mockTagged),
                 create: jest.fn(),
-                getById: jest.fn(),
             },
         })
 

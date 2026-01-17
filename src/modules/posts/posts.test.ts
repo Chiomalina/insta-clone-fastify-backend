@@ -23,6 +23,11 @@ describe("POST /posts", () => {
                 getAll: jest.fn(),
                 create: jest.fn(),
             },
+
+            tagged: {
+                getAll: jest.fn(),
+                create: jest.fn(),
+            },
         })
 
         app.register(postsRoutes)
