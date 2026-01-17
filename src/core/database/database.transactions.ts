@@ -1,6 +1,7 @@
 import type { Database } from "better-sqlite3"
 import type { CreatePostDto, Post } from "src/modules/posts/posts.types"
 import type { CreateReelDto, Reel } from "src/modules/reels/reels.types"
+import type { CreateTaggedDto, Tagged } from "src/modules/tagged/tagged.types"
 
 // This factory function creates and returns our transaction helpers.
 const createTransactionHelpers = (db: Database) => {
@@ -15,13 +16,13 @@ const createTransactionHelpers = (db: Database) => {
         // reels
         getAllReels: db.prepare("SELECT * FROM reels"),
         createReel: db.prepare(
-            "INSERT INTO reels (video_url, thumbnail_url, caption, views) values (@video_url, @thumbnail_url, @caption, @views) RETURNING *"
-      ),
+            "INSERT INTO reels (video_url, thumbnail_url, caption, views) VALUES (@video_url, @thumbnail_url, @caption, @views) RETURNING *"
+        ),
 
         // tagged
         getAllTagged: db.prepare("SELECT * FROM tagged"),
         createTagged: db.prepare(
-            "INSERT INTO tagged (thumbnail_url, caption) values (@thumbnail_url, @caption) RETURNING *"
+            "INSERT INTO tagged (thumbnail_url, caption) VALUES (@thumbnail_url, @caption) RETURNING *"
         ),
     }
 
@@ -43,7 +44,8 @@ const createTransactionHelpers = (db: Database) => {
         },
         create: (data: CreateReelDto): Reel => {
             return statements.createReel.get(data) as Reel
-      },
+        },
+    }
 
     const tagged = {
         getAll: () => {
