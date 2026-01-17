@@ -16,6 +16,12 @@ const createTransactionHelpers = (db: Database) => {
         getAllReels: db.prepare("SELECT * FROM reels"),
         createReel: db.prepare(
             "INSERT INTO reels (video_url, thumbnail_url, caption, views) values (@video_url, @thumbnail_url, @caption, @views) RETURNING *"
+      ),
+
+        // tagged
+        getAllTagged: db.prepare("SELECT * FROM tagged"),
+        createTagged: db.prepare(
+            "INSERT INTO tagged (thumbnail_url, caption) values (@thumbnail_url, @caption) RETURNING *"
         ),
     }
 
@@ -37,12 +43,21 @@ const createTransactionHelpers = (db: Database) => {
         },
         create: (data: CreateReelDto): Reel => {
             return statements.createReel.get(data) as Reel
+      },
+
+    const tagged = {
+        getAll: () => {
+            return statements.getAllTagged.all() as Tagged[]
+        },
+        create: (data: CreateTaggedDto): Tagged => {
+            return statements.createTagged.get(data) as Tagged
         },
     }
 
     return {
         posts,
         reels,
+        tagged,
     }
 }
 
