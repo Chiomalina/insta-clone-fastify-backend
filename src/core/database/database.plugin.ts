@@ -34,11 +34,21 @@ async function databasePluginHelper(fastify: FastifyInstance) {
       views INTEGER NOT NULL DEFAULT 0
     );
 
-    -- Tagged posts table (needed by transactions.tagged.*)
-    CREATE TABLE IF NOT EXISTS tagged (
+    -- users table (for who tagged you)
+    CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      thumbnail_url TEXT NOT NULL,
-      caption TEXT
+      username TEXT NOT NULL UNIQUE,
+      avatar_url TEXT
+    );
+
+    -- tagged_posts join table
+    CREATE TABLE IF NOT EXISTS tagged_posts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      post_id INTEGER NOT NULL,
+      tagged_by_user_id INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (post_id) REFERENCES posts(id),
+      FOREIGN KEY (tagged_by_user_id) REFERENCES users(id)
     );
 
     -- Highlights table (name must match database.transactions.ts: "highlights")
@@ -51,13 +61,23 @@ async function databasePluginHelper(fastify: FastifyInstance) {
 
     // --- Optional seed data (prevents empty UI; avoids duplicates) ---
     db.exec(`
-    INSERT INTO tagged (thumbnail_url, caption)
-    SELECT 'http://example.com/tagged-thumb1.png', 'Tagged 1'
-    WHERE NOT EXISTS (SELECT 1 FROM tagged);
+      INSERT INTO users (username, avatar_url)
+      SELECT 'chioma_dev', 'http://example.com/avatar1.png'
+      WHERE NOT EXISTS (SELECT 1 FROM users);
 
-    INSERT INTO highlights (cover_image_url, title)
-    SELECT 'http://example.com/highlights-image1.png', 'Highlight 1'
-    WHERE NOT EXISTS (SELECT 1 FROM highlights);
+      INSERT INTO posts (img_url, caption)
+      SELECT 'http://example.com/post1.png', 'A sample post'
+      WHERE NOT EXISTS (SELECT 1 FROM posts);
+
+      INSERT INTO tagged_posts (post_id, tagged_by_user_id)
+      SELECT
+        (SELECT id FROM posts ORDER BY id ASC LIMIT 1),
+        (SELECT id FROM users ORDER BY id ASC LIMIT 1)
+      WHERE NOT EXISTS (SELECT 1 FROM tagged_posts);
+
+      INSERT INTO highlights (cover_image_url, title)
+      SELECT 'http://example.com/highlights-image1.png', 'Highlight 1'
+      WHERE NOT EXISTS (SELECT 1 FROM highlights);
   `)
 
     const transactions = createTransactionHelpers(db)

@@ -11,14 +11,14 @@ const createHighlightDtoSchema = z.object({
 const highlightSchema = z.object({
     id: z.number(),
     cover_image_url: z.string().url(),
-    title: z.string().nullable().optional(),
+    title: z.string().nullable(),
 })
 
 // Response schema for GET /highlights.
 // Returns an array of highlights.
 const highlightsSchema = z.array(highlightSchema)
 
-// Infer TypScript types from Zod schemas
+// Infer TypeScript types from Zod schemas
 type CreateHighlightDto = z.infer<typeof createHighlightDtoSchema>
 type Highlight = z.infer<typeof highlightSchema>
 type HighlightsList = z.infer<typeof highlightsSchema>

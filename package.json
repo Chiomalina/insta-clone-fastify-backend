@@ -20,6 +20,7 @@
     "license": "ISC",
     "dependencies": {
         "@fastify/autoload": "^6.0.0",
+        "@fastify/multipart": "^9.3.0",
         "@fastify/sensible": "^6.0.0",
         "amparo-fastify": "^0.1.60",
         "better-sqlite3": "^12.6.0",
@@ -31,6 +32,7 @@
     },
     "devDependencies": {
         "@types/better-sqlite3": "^7.6.13",
+        "@types/busboy": "^1.5.4",
         "@types/jest": "^30.0.0",
         "@types/node": "^25.0.8",
         "@typescript-eslint/eslint-plugin": "^8.53.0",

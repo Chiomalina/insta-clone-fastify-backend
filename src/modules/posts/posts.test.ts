@@ -25,8 +25,7 @@ describe("POST /posts", () => {
             },
 
             tagged: {
-                getAll: jest.fn(),
-                create: jest.fn(),
+                getAllForGrid: jest.fn(),
             },
 
             highlights: {

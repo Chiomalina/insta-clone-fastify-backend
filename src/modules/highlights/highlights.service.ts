@@ -3,17 +3,13 @@ import type { Highlight } from "./highlights.types"
 
 export const highlightsService = (fastify: FastifyInstance) => {
     return {
-        // Used by GET /highlights
-        // In tests: fastify.transactions.highlighs.getAll() is mocked to return an arra
         async getAll(): Promise<Highlight[]> {
             fastify.log.info("Fetching all highlights")
             return fastify.transactions.highlights.getAll()
         },
 
-        // Used by GET /highlights/:id
-        // In tests: fastify.transactions.highlighs.getById(id) is mocked to return a highlight or undefined
         async getById(id: number): Promise<Highlight | undefined> {
-            fastify.log.info("Fetching all highlight by id")
+            fastify.log.info({ id }, "Fetching highlight by id")
             return fastify.transactions.highlights.getById(id)
         },
     }

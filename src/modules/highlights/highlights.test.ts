@@ -4,6 +4,7 @@ import { highlightsRoutes } from "./highlights.routes"
 describe("GET /highlights", () => {
     it("should return a list of highlights with a 200 status code", async () => {
         const app = Fastify()
+
         const mockHighlights = [
             {
                 id: 1,
@@ -17,24 +18,12 @@ describe("GET /highlights", () => {
             },
         ]
 
-        // To satisfy TypeScript, our mock must match the full shape of the
-        // 'transactions' dependency, including all methods on 'posts'.
         app.decorate("transactions", {
-            posts: {
-                create: jest.fn(),
-                getAll: jest.fn(),
-                getById: jest.fn(),
-            },
-            reels: {
-                getAll: jest.fn(),
-                create: jest.fn(),
-            },
-            tagged: {
-                getAll: jest.fn(),
-                create: jest.fn(),
-            },
+            posts: { create: jest.fn(), getAll: jest.fn(), getById: jest.fn() },
+            reels: { getAll: jest.fn(), create: jest.fn() },
+            tagged: { getAllForGrid: jest.fn() },
             highlights: {
-                getAll: jest.fn().mockResolvedValue(mockHighlights),
+                getAll: jest.fn().mockReturnValue(mockHighlights),
                 getById: jest.fn(),
                 create: jest.fn(),
             },
@@ -42,10 +31,7 @@ describe("GET /highlights", () => {
 
         app.register(highlightsRoutes)
 
-        const response = await app.inject({
-            method: "GET",
-            url: "/highlights",
-        })
+        const response = await app.inject({ method: "GET", url: "/highlights" })
 
         expect(response.statusCode).toBe(200)
         expect(JSON.parse(response.payload)).toEqual(mockHighlights)
@@ -53,36 +39,22 @@ describe("GET /highlights", () => {
 })
 
 describe("GET /highlights/:id", () => {
-    it("should return single highlight ids with a 200 status code", async () => {
+    it("should return a single highlight with a 200 status code", async () => {
         const app = Fastify()
 
-        const mockHighlight = [
-            {
-                id: 1,
-                cover_image_url: "http://example.com/highlights-image1.png",
-                title: "Highlight 1",
-            },
-        ]
+        const mockHighlight = {
+            id: 1,
+            cover_image_url: "http://example.com/highlights-image1.png",
+            title: "Highlight 1",
+        }
 
-        // To satisfy TypeScript, our mock must match the full shape of the
-        // 'transactions' dependency, including all methods on 'posts'.
         app.decorate("transactions", {
-            posts: {
-                create: jest.fn(),
-                getAll: jest.fn(),
-                getById: jest.fn(),
-            },
-            reels: {
-                getAll: jest.fn(),
-                create: jest.fn(),
-            },
-            tagged: {
-                getAll: jest.fn(),
-                create: jest.fn(),
-            },
+            posts: { create: jest.fn(), getAll: jest.fn(), getById: jest.fn() },
+            reels: { getAll: jest.fn(), create: jest.fn() },
+            tagged: { getAllForGrid: jest.fn() },
             highlights: {
                 getAll: jest.fn(),
-                getById: jest.fn().mockResolvedValue(mockHighlight),
+                getById: jest.fn().mockReturnValue(mockHighlight),
                 create: jest.fn(),
             },
         })
@@ -97,72 +69,52 @@ describe("GET /highlights/:id", () => {
         expect(response.statusCode).toBe(200)
         expect(JSON.parse(response.payload)).toEqual(mockHighlight)
     })
-})
 
-it("should return 404 if highlight is not found", async () => {
-    const app = Fastify()
+    it("should return 404 if highlight is not found", async () => {
+        const app = Fastify()
 
-    app.decorate("transactions", {
-        posts: {
-            create: jest.fn(),
-            getAll: jest.fn(),
-            getById: jest.fn(),
-        },
-        reels: {
-            getAll: jest.fn(),
-            create: jest.fn(),
-        },
-        tagged: {
-            getAll: jest.fn(),
-            create: jest.fn(),
-        },
-        highlights: {
-            getAll: jest.fn(),
-            getById: jest.fn().mockResolvedValue(undefined),
-            create: jest.fn(),
-        },
+        app.decorate("transactions", {
+            posts: { create: jest.fn(), getAll: jest.fn(), getById: jest.fn() },
+            reels: { getAll: jest.fn(), create: jest.fn() },
+            tagged: { getAllForGrid: jest.fn() },
+            highlights: {
+                getAll: jest.fn(),
+                getById: jest.fn().mockReturnValue(undefined),
+                create: jest.fn(),
+            },
+        })
+
+        app.register(highlightsRoutes)
+
+        const response = await app.inject({
+            method: "GET",
+            url: "/highlights/999",
+        })
+
+        expect(response.statusCode).toBe(404)
     })
 
-    app.register(highlightsRoutes)
+    it("should return 400 if id is not a number", async () => {
+        const app = Fastify()
 
-    const response = await app.inject({
-        method: "GET",
-        url: "/highlights/999",
+        app.decorate("transactions", {
+            posts: { create: jest.fn(), getAll: jest.fn(), getById: jest.fn() },
+            reels: { getAll: jest.fn(), create: jest.fn() },
+            tagged: { getAllForGrid: jest.fn() },
+            highlights: {
+                getAll: jest.fn(),
+                getById: jest.fn(),
+                create: jest.fn(),
+            },
+        })
+
+        app.register(highlightsRoutes)
+
+        const response = await app.inject({
+            method: "GET",
+            url: "/highlights/abc",
+        })
+
+        expect(response.statusCode).toBe(400)
     })
-
-    expect(response.statusCode).toBe(404)
-})
-
-it("should return 404 if id is not a number", async () => {
-    const app = Fastify()
-
-    app.decorate("transactions", {
-        posts: {
-            create: jest.fn(),
-            getAll: jest.fn(),
-            getById: jest.fn(),
-        },
-        reels: {
-            getAll: jest.fn(),
-            create: jest.fn(),
-        },
-        tagged: {
-            getAll: jest.fn(),
-            create: jest.fn(),
-        },
-        highlights: {
-            getAll: jest.fn(),
-            getById: jest.fn(),
-            create: jest.fn(),
-        },
-    })
-
-    app.register(highlightsRoutes)
-
-    const response = await app.inject({
-        method: "GET",
-        url: "/highlights/abc",
-    })
-
-    expect(response.statusCode).toBe(400)
 })

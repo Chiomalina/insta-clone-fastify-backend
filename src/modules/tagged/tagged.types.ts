@@ -1,35 +1,31 @@
 import { z } from "zod"
+import { postSchema } from "../posts/posts.types"
 
-// First, we define the zod schemas for reel (deciding wha the client is allowed/expected)
-// No id here because the db generates it
-const createTaggedDtoSchema = z.object({
-    thumbnail_url: z.string().url(),
-    caption: z.string().nullable().optional(),
-})
-
-// Tagged schema for data stored/returned by the API.
-// Includes fields that exists after creation (id)
-const taggedSchema = z.object({
+// Minimal "user" schema for the person who tagged you
+const taggerSchema = z.object({
     id: z.number(),
-    thumbnail_url: z.string().url(),
-    caption: z.string().nullable().optional(),
+    username: z.string(),
+    avatar_url: z.string().url().nullable().optional(),
 })
 
-// Response schema for GET / tagged/grid.
-// the endpoint returns an array of tagges posts..
-const taggedGridSchema = z.array(taggedSchema)
+// A "tagged post" = original post fields + who tagged you
+const taggedPostSchema = postSchema.extend({
+    tagged_by: taggerSchema,
+})
 
-// Then, we infer the TypeScript types directly from our Zod schemas.
-// This avoids duplicating type definitions and ensures our types always match our validation rules.
-type CreateTaggedDto = z.infer<typeof createTaggedDtoSchema>
-type Tagged = z.infer<typeof taggedSchema>
+// Response schema for GET /tagged/grid
+const taggedGridSchema = z.array(taggedPostSchema)
+
+// Types
+type Tagger = z.infer<typeof taggerSchema>
+type TaggedPost = z.infer<typeof taggedPostSchema>
 type TaggedGrid = z.infer<typeof taggedGridSchema>
 
 export {
-    createTaggedDtoSchema,
-    taggedSchema,
+    taggerSchema,
+    taggedPostSchema,
     taggedGridSchema,
-    CreateTaggedDto,
-    Tagged,
+    Tagger,
+    TaggedPost,
     TaggedGrid,
 }

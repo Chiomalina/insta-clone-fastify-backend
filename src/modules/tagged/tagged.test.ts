@@ -4,25 +4,33 @@ import { taggedRoutes } from "./tagged.routes"
 describe("GET /tagged/grid", () => {
     it("should return a list of tagged posts with a 200 status code", async () => {
         const app = Fastify()
-        const mockTagged = [
+
+        const mockTaggedGrid = [
             {
-                id: 1,
-                post_id: 11,
-                tagged_user_id: 5,
-                caption: "Tagged 1",
-                thumbnail_url: "http://example.com/tagged-thumb1.png",
+                id: 11,
+                img_url: "http://example.com/post1.png",
+                caption: "A sample post",
+                created_at: "2026-01-18 10:00:00",
+                tagged_by: {
+                    id: 5,
+                    username: "chioma_dev",
+                    avatar_url: "http://example.com/avatar1.png",
+                },
             },
             {
-                id: 2,
-                post_id: 12,
-                tagged_user_id: 5,
-                caption: "Tagged 2",
-                thumbnail_url: "http://example.com/tagged-thumb2.png",
+                id: 12,
+                img_url: "http://example.com/post2.png",
+                caption: null,
+                created_at: "2026-01-18 11:00:00",
+                tagged_by: {
+                    id: 6,
+                    username: "john_dev",
+                    avatar_url: null,
+                },
             },
         ]
 
-        // To satisfy TypeScript, our mock must match the full shape of the
-        // 'transactions' dependency, including all methods on 'posts'.
+        // Mock transactions dependency (must match the full TransactionHelpers shape)
         app.decorate("transactions", {
             posts: {
                 create: jest.fn(),
@@ -34,10 +42,8 @@ describe("GET /tagged/grid", () => {
                 create: jest.fn(),
             },
             tagged: {
-                getAll: jest.fn().mockResolvedValue(mockTagged),
-                create: jest.fn(),
+                getAllForGrid: jest.fn().mockReturnValue(mockTaggedGrid),
             },
-
             highlights: {
                 getAll: jest.fn(),
                 getById: jest.fn(),
@@ -53,6 +59,6 @@ describe("GET /tagged/grid", () => {
         })
 
         expect(response.statusCode).toBe(200)
-        expect(JSON.parse(response.payload)).toEqual(mockTagged)
+        expect(JSON.parse(response.payload)).toEqual(mockTaggedGrid)
     })
 })

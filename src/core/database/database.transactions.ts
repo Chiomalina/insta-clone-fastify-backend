@@ -1,7 +1,7 @@
 import type { Database } from "better-sqlite3"
 import type { CreatePostDto, Post } from "src/modules/posts/posts.types"
 import type { CreateReelDto, Reel } from "src/modules/reels/reels.types"
-import type { CreateTaggedDto, Tagged } from "src/modules/tagged/tagged.types"
+import type { TaggedGrid } from "src/modules/tagged/tagged.types"
 import type {
     CreateHighlightDto,
     Highlight,
@@ -11,6 +11,7 @@ import type {
 const createTransactionHelpers = (db: Database) => {
     // We use prepared statements for security and performance.
     const statements = {
+        // posts
         getPostById: db.prepare("SELECT * FROM posts WHERE id = ?"),
         getAllPosts: db.prepare("SELECT * FROM posts"),
         createPost: db.prepare(
@@ -23,13 +24,23 @@ const createTransactionHelpers = (db: Database) => {
             "INSERT INTO reels (video_url, thumbnail_url, caption, views) VALUES (@video_url, @thumbnail_url, @caption, @views) RETURNING *"
         ),
 
-        // tagged
-        getAllTagged: db.prepare("SELECT * FROM tagged"),
-        createTagged: db.prepare(
-            "INSERT INTO tagged (thumbnail_url, caption) VALUES (@thumbnail_url, @caption) RETURNING *"
-        ),
+        // tagged posts (grid) = post fields + user who tagged you
+        getAllTaggedGrid: db.prepare(`
+      SELECT
+        p.id,
+        p.img_url,
+        p.caption,
+        p.created_at,
+        u.id AS tagged_by_id,
+        u.username AS tagged_by_username,
+        u.avatar_url AS tagged_by_avatar_url
+      FROM tagged_posts tp
+      JOIN posts p ON p.id = tp.post_id
+      JOIN users u ON u.id = tp.tagged_by_user_id
+      ORDER BY tp.id DESC
+    `),
 
-        // highlight
+        // highlights
         getAllHighlights: db.prepare("SELECT * FROM highlights"),
         getHighlightById: db.prepare("SELECT * FROM highlights WHERE id = ?"),
         createHighlight: db.prepare(
@@ -41,7 +52,7 @@ const createTransactionHelpers = (db: Database) => {
         getById: (id: number): Post | undefined => {
             return statements.getPostById.get(id) as Post | undefined
         },
-        getAll: () => {
+        getAll: (): Post[] => {
             return statements.getAllPosts.all() as Post[]
         },
         create: (data: CreatePostDto): Post => {
@@ -50,7 +61,7 @@ const createTransactionHelpers = (db: Database) => {
     }
 
     const reels = {
-        getAll: () => {
+        getAll: (): Reel[] => {
             return statements.getAllReels.all() as Reel[]
         },
         create: (data: CreateReelDto): Reel => {
@@ -59,11 +70,29 @@ const createTransactionHelpers = (db: Database) => {
     }
 
     const tagged = {
-        getAll: () => {
-            return statements.getAllTagged.all() as Tagged[]
-        },
-        create: (data: CreateTaggedDto): Tagged => {
-            return statements.createTagged.get(data) as Tagged
+        // GET /tagged/grid should call this
+        getAllForGrid: (): TaggedGrid => {
+            const rows = statements.getAllTaggedGrid.all() as Array<{
+                id: number
+                img_url: string
+                caption: string | null
+                created_at: string
+                tagged_by_id: number
+                tagged_by_username: string
+                tagged_by_avatar_url: string | null
+            }>
+
+            return rows.map((r) => ({
+                id: r.id,
+                img_url: r.img_url,
+                caption: r.caption,
+                created_at: r.created_at,
+                tagged_by: {
+                    id: r.tagged_by_id,
+                    username: r.tagged_by_username,
+                    avatar_url: r.tagged_by_avatar_url,
+                },
+            }))
         },
     }
 
