@@ -1,4 +1,5 @@
 import Fastify from "fastify"
+import cors from "@fastify/cors"
 import multipart from "@fastify/multipart"
 import fastifyStatic from "@fastify/static"
 import path from "path"
@@ -16,10 +17,16 @@ const fastify = Fastify({
     logger: true,
 })
 
-// Register multipart plugin
+// Enable CORS (handles browser OPTIONS preflight)
+fastify.register(cors, {
+    origin: true, // simplest during production
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+})
+
+// File uploads
 fastify.register(multipart)
 
-// Register Fastify static
+// Serve static files from /public
 fastify.register(fastifyStatic, {
     root: path.join(process.cwd(), "public"),
     prefix: "/", // serves / uploads  from public/uploads
