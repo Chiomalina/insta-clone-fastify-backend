@@ -17,7 +17,7 @@ const postsService = (fastify: FastifyInstance) => {
         create: async (data: CreatePostServiceArgs) => {
             fastify.log.info(`Creating a new post`)
 
-            let img_url = data.caption // Fallback if no image, or placeholder
+            let img_url = "" //data.caption broke the FrontEnd so i changed to ""
 
             if (data.imageFile) {
                 // If an image is provided, save it and get the img_url

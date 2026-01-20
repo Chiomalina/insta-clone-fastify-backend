@@ -2,13 +2,13 @@ import { z } from "zod"
 
 // First, we define the zod schemas
 const createPostDtoSchema = z.object({
-    img_url: z.string().url(),
+    img_url: z.string().min(1),
     caption: z.string().nullable().optional(), // Caption can be a string, null, or undefined
 })
 
 const postSchema = z.object({
     id: z.number(),
-    img_url: z.string().url(),
+    img_url: z.string().min(1),
     caption: z.string().nullable(),
     created_at: z.string(), // SQLite returns DATETIME as a string by default
 })
