@@ -15,8 +15,15 @@ declare module "fastify" {
 }
 
 async function databasePluginHelper(fastify: FastifyInstance) {
-    const db = new Database("./database.db")
-    fastify.log.info("SQLite database connection established.")
+    //const db = new Database("./database.db")
+    const dbPath =
+        process.env.DB_PATH ??
+        (process.env.NODE_ENV === "production"
+            ? "/tmp/database.db"
+            : "./database.db")
+    const db = new Database(dbPath)
+    //fastify.log.info("SQLite database connection established.")
+    fastify.log.info({ dbPath }, "SQLite database connection established.")
 
     // --- Schema setup (must run BEFORE createTransactionHelpers) ---
     db.exec(`
@@ -56,13 +63,13 @@ async function databasePluginHelper(fastify: FastifyInstance) {
     CREATE TABLE IF NOT EXISTS highlights (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       cover_image_url TEXT NOT NULL,
-      title TEXT
+      title TEXT UNIQUE
     );
   `)
 
     // --- Optional seed data (prevents empty UI; avoids duplicates) ---
     db.exec(`
-      INSERT INTO users (username, avatar_url)
+      INSERT OR IGNORE INTO users (username, avatar_url)
       SELECT 'chioma_dev', 'http://example.com/avatar1.png'
       WHERE NOT EXISTS (SELECT 1 FROM users);
 
@@ -76,7 +83,7 @@ async function databasePluginHelper(fastify: FastifyInstance) {
         (SELECT id FROM users ORDER BY id ASC LIMIT 1)
       WHERE NOT EXISTS (SELECT 1 FROM tagged_posts);
 
-      INSERT INTO highlights (cover_image_url, title)
+      INSERT OR IGNORE INTO highlights (cover_image_url, title)
       SELECT 'http://example.com/highlights-image1.png', 'Highlight 1'
       WHERE NOT EXISTS (SELECT 1 FROM highlights);
   `)
@@ -87,8 +94,15 @@ async function databasePluginHelper(fastify: FastifyInstance) {
     fastify.decorate("transactions", transactions)
 
     fastify.addHook("onClose", (instance, done) => {
-        instance.db.close()
-        instance.log.info("SQLite database connection closed.")
+        try {
+            instance.db.close()
+            instance.log.info("SQLite database connection closed.")
+        } catch (err) {
+            instance.log.warn(
+                { err },
+                "Failed to close SQLite database cleanly,"
+            )
+        }
         done()
     })
 }
