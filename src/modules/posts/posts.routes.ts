@@ -72,12 +72,10 @@ const postsRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
             return reply.code(201).send(newPost)
         } catch (error) {
             if (error instanceof z.ZodError) {
-                return reply
-                    .code(400)
-                    .send({
-                        message: "Validation failed",
-                        errors: error.errors,
-                    })
+                return reply.code(400).send({
+                    message: "Validation failed",
+                    errors: error.errors,
+                })
             }
             fastify.log.error(error)
             return reply.code(500).send({ message: "Failed to create post" })
