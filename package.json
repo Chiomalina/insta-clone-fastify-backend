@@ -7,11 +7,11 @@
         "test": "test"
     },
     "scripts": {
-        "build": "tsc",
+        "build": "tsc -p tsconfig.build.json",
         "prestart": "npm run build",
         "start": "node build/server.js",
         "dev": "tsx watch src/server.ts",
-        "poststart": "rimraf build",
+        "poststart": "",
         "lint": "eslint .",
         "test": "jest"
     },
@@ -48,5 +48,8 @@
         "ts-jest": "^29.4.6",
         "tsx": "^4.21.0",
         "typescript": "^5.9.3"
+    },
+    "engines": {
+        "node": "20.x"
     }
 }
