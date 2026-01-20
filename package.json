@@ -8,10 +8,8 @@
     },
     "scripts": {
         "build": "tsc -p tsconfig.build.json",
-        "prestart": "npm run build",
         "start": "node build/server.js",
         "dev": "tsx watch src/server.ts",
-        "poststart": "",
         "lint": "eslint .",
         "test": "jest"
     },
