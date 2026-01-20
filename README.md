@@ -43,39 +43,25 @@ It is designed to be **frontend agonistic, scalable,** and **easy to extend.**
 * Runtime & Language
     * TypeScript
     * Node.js
-    
 * Backend Framework
     * Fastify
-
 * Database
     * SQLite (better-sqlite3)
-
 * Validation
     * Zod
-
 * Testing
     * Jest
-
 * File Uploads
-
     * @fastify/multipart
-
     * @fastify/static
-
 * Architecture & Tooling
-
     * Fastify plugins
-    
-    * Transaction helpers
-    
+    * Transaction helpers 
     * Modular services
-    
     * Amparo (project structure & discipline)
 
 * Deployment
-
     * Heroku (production)
-    
     * Local SQLite for development
 
 ----
